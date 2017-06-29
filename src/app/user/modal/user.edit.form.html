@@ -1,0 +1,29 @@
+<div id="userModal" class="container">
+    <div class="row">
+        <form [formGroup]="form" class="m-4 w-100">
+            <h5 class="mb-3"><i class="fa fa-pencil-square-o" aria-hidden="true"></i> EDIT USER</h5>
+            <div class="form-group input-group">
+                <div class="input-group-addon">
+                    <i class="fa fa-user-circle-o" aria-hidden="true"></i>
+                </div>
+                <input type="text" formControlName="name" class="form-control" id="name" placeholder="Full Name">
+            </div>  
+
+            <div class="form-group input-group">
+                <div class="input-group-addon">
+                    <i class="fa fa-address-card-o" aria-hidden="true"></i>
+                </div>
+                <input type="text" formControlName="displayName" class="form-control" id="displayName" placeholder="Display Name">
+            </div>    
+
+            <div class="form-group input-group">
+                <div class="input-group-addon">@</div>
+                <input type="text" formControlName="email" class="form-control" id="email" placeholder="Email Address">
+            </div>
+            <input type="hidden" formControlName="id" />
+            <input type="hidden" formControlName="key" />
+            <button type="button" class="btn btn-primary mr-auto f-right" (click)="onSubmit()" [disabled]="!form.valid">Save</button>
+
+        </form>
+    </div>
+</div>

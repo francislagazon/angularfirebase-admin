@@ -1,0 +1,16 @@
+{
+  "extends": "../tsconfig.json",
+  "compilerOptions": {
+    "outDir": "../out-tsc/app",
+    "module": "es2015",
+    "sourceMap": true,
+    "baseUrl": "",
+    "types": []
+  },
+  "exclude": [
+    "test.ts",
+    "**/*.spec.ts",
+    "./firebase-backend/functions/index.ts",
+    "./firebase-backend/functions/test.ts"
+  ]
+}

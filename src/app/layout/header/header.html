@@ -1,0 +1,22 @@
+<nav class="navbar navbar-toggleable-md navbar-inverse fixed-top bg-blue">
+    <button class="navbar-toggler navbar-toggler-right hidden-lg-up" type="button" data-toggle="collapse" data-target="#navbarsExampleDefault" aria-controls="navbarsExampleDefault" aria-expanded="false" aria-label="Toggle navigation">
+    <span class="navbar-toggler-icon"></span>
+    </button>
+    <a class="navbar-brand" href="#">Dashboard</a>
+    
+    <div *ngIf=" !user.isLogged " class="form-login form-inline mt-2 mt-md-0 ml-auto">
+        <p class="mb-0 mt-0 mr-2 d-inline-block font-weight-bold text-white">Login with: </p>
+        
+        <a  class="btnLoginGoogle btn btn-primary px-2 py-1 mr-1">
+            <i (click)="onClickLoginWithGoogle()" class="fa fa-google" aria-hidden="true"></i>
+        </a>
+        <a  class="btnLoginFacebook btn btn-primary px-2 py-1 col-1">
+            <i (click)="onClickLoginWithFacebook()" class="fa fa-facebook" aria-hidden="true"></i>
+        </a>
+    </div>
+    <div *ngIf=" user.isLogged " class="welcome-user text-white">
+        You are logged in as <b>{{ user.auth.currentUser.displayName }}</b> | 
+        <a href class="logout" (click)=" user.logout() ">Log Out</a>
+    </div>
+
+</nav>

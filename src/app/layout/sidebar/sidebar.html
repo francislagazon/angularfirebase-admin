@@ -1,0 +1,52 @@
+<ul class="nav nav-pills flex-column">
+    <li class="nav-item">
+        <a class="nav-link"
+            [routerLinkActive]="['active']"
+            [routerLinkActiveOptions]="{exact:true}"
+            routerLink="/">
+        Dashboard</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link">
+        Users Management</a>
+        <ul class="sub-link">
+            <li class="nav-item">
+                <a class="nav-link"
+                    [routerLinkActive]="['active']"
+                    [routerLinkActiveOptions]="{exact:true}"
+                    routerLink="./users">
+                Users</a>
+            </li>
+             <li class="nav-item">
+                <a class="nav-link"
+                    [routerLinkActive]="['active']"
+                    [routerLinkActiveOptions]="{exact:true}"
+                    routerLink="./users/trash">
+                Trash</a>
+             </li>
+        </ul>
+
+    </li>
+    <li class="nav-item">
+        <a class="nav-link">
+        Forum Management
+        </a>
+        <ul class="sub-link">
+            <li class="nav-item">
+                <a class="nav-link"
+                    [routerLinkActive]="['active']"
+                    [routerLinkActiveOptions]="{exact:true}"
+                    routerLink="./config">
+                Configuration</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link"
+                    [routerLinkActive]="['active']"
+                    [routerLinkActiveOptions]="{exact:true}"
+                    routerLink="./category">
+                Categories</a>
+            </li>
+        </ul>
+
+    </li>
+</ul>

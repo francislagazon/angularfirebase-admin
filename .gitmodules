@@ -1,0 +1,3 @@
+[submodule "src/firebase-backend"]
+	path = src/firebase-backend
+	url = https://github.com/thruthesky/firebase-backend

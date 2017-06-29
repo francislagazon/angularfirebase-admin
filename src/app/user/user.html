@@ -1,0 +1,50 @@
+<div class="container">
+    <div class="row">
+        <h5 class="w-100">User Management</h5>
+        <div class="float-right ml-auto ">
+        <p class="d-inline-block">Filter by: </p> 
+        <select class="form-control col-sm-6 d-inline-block" name="nooflist" [(ngModel)]="nooflist" (change)="loadUsers()">
+            <option value="5">5</option>
+            <option value="10">10</option>
+            <option value="15">15</option>
+            <option value="20">20</option>
+        </select>
+        </div>
+        <div class="row alert_position" *ngIf="alerts.active">
+            <ngb-alert [type]="alerts.type" class="ml-auto mr-auto" (close)="closeAlert()">{{ alerts.message }}</ngb-alert>
+        </div> 
+        <table class="table table-condensed table-striped">
+            <tr>
+            <th width="10%">&nbsp;</th>
+            <th width="30%">ID</th>
+            <th width="30%">Display Name</th>
+            <th width="30%">Email</th>
+            </tr>
+            <tr *ngFor=" let user of pagedItems; let i = index ">
+            <td>
+                <i class="fa fa-pencil col-5" aria-hidden="true" (click)="onClickEdit( user )"></i> 
+                <i *ngIf="!trash; else getTrash" class="fa fa-times text-danger col-5" aria-hidden="true" (click)=" onClickDelete( user.key ) "></i>
+                <ng-template #getTrash>
+                    <i class="fa fa-undo text-success col-5" aria-hidden="true" (click)=" onClickRestore( user.key ) "></i>
+                </ng-template>
+            </td>
+            <td>{{user.uid}}</td>
+            <td>{{user.name}}</td>
+            <td>{{user.email}}</td>
+            </tr>
+        </table>
+        <nav aria-label="navigation" class="float-right d-inline-block">
+            <ul *ngIf="pager.pages && pager.pages.length" class="pagination">
+                <li class="page-item" [ngClass]="{disabled:pager.currentPage === 1}">
+                    <a class="page-link" (click)="setPage(pager.currentPage - 1)">Previous</a>
+                </li>
+                <li class="page-item" *ngFor="let page of pager.pages" [ngClass]="{active:pager.currentPage === page}">
+                    <a class="page-link" (click)="setPage(page)">{{page}}</a>
+                </li>
+                <li class="page-item" [ngClass]="{disabled:pager.currentPage === pager.totalPages}">
+                    <a class="page-link" (click)="setPage(pager.currentPage + 1)">Next</a>
+                </li>
+            </ul>
+        </nav>
+    </div>
+</div>

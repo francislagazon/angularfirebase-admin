@@ -1,0 +1,56 @@
+<div class="container">
+  <div class="row alert_position" *ngIf="alerts.active">
+    <ngb-alert [type]="alerts.type" class="ml-auto mr-auto" (close)="closeAlert()">{{ alerts.message }}</ngb-alert>
+  </div>  
+  <div class="row">
+    <h5 class="w-100">Forum Categories</h5>
+    <div class="form-group float-left">
+    Create a forum category:
+    <input name="category_id" [(ngModel)]="category_id" placeholder="Category ID">
+    <input name="category_name" [(ngModel)]="category_name" placeholder="Category Name">
+    <button type="button" class="btn btn-primary" (click)="onClickCreateCategory()">Submit</button>
+    </div>
+    <div class="float-right ml-auto">
+    <p class="d-inline-block">Filter by: </p> 
+    <select class="form-control col-sm-6 d-inline-block" name="nooflist" [(ngModel)]="nooflist" (change)="listenCategory()">
+        <option value="5">5</option>
+        <option value="10">10</option>
+        <option value="15">15</option>
+        <option value="20">20</option>
+    </select>
+    </div>
+  </div>
+  <div *ngIf=" categories && categories.length ">
+    <table class="table w-100">
+      <tr>
+        <th width="5%"></th>
+        <th width="10%">ID</th>
+        <th width="30%">Name</th>
+        <th width="50">Description</th>
+        <th width="5%"></th>
+      </tr>
+      <tr *ngFor=" let c of pagedItems; let i = index">
+        <td><i class="fa fa-times ml-2 mr-4" aria-hidden="true" (click)="onClickCategoryDelete( c.id ) "></i></td>
+        <td>
+          {{ c.id }}
+        </td>
+        <td><input type="text" name="name" value="{{ c.name }}" [(ngModel)]="c.name" class="w-100"></td>
+        <td><input type="text" name="desc" value="{{ c.description }}" [(ngModel)]="c.description" class="w-100"></td>
+        <td><button type="button" class="btn btn-primary" (click)="onClickCategoryEdit( c.id )">SAVE</button></td>
+      </tr>
+    </table>
+    <nav aria-label="navigation" class="float-right d-inline-block">
+        <ul *ngIf="pager.pages && pager.pages.length" class="pagination">
+            <li class="page-item" [ngClass]="{disabled:pager.currentPage === 1}">
+                <a class="page-link" (click)="setPage(pager.currentPage - 1)">Previous</a>
+            </li>
+            <li class="page-item" *ngFor="let page of pager.pages" [ngClass]="{active:pager.currentPage === page}">
+                <a class="page-link" (click)="setPage(page)">{{page}}</a>
+            </li>
+            <li class="page-item" [ngClass]="{disabled:pager.currentPage === pager.totalPages}">
+                <a class="page-link" (click)="setPage(pager.currentPage + 1)">Next</a>
+            </li>
+        </ul>
+    </nav>
+  </div>
+</div>

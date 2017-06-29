@@ -1,0 +1,103 @@
+/* You can add global styles to this file, and also import other style files */
+@import url("app/forum/category/category.css");
+@import url("app/layout/header/header.css");
+
+html, body, h1, h2, h3, h4, h5, h6, div, span, td, li, a, small, label, i, strong, button, .btn, .hidden-sm-down {
+     font-family: Arial, Helvetica, sans-serif;
+     font-size: 1rem
+}
+
+/*
+ * Typography
+ */
+
+h1 {
+  margin-bottom: 20px;
+  padding-bottom: 9px;
+  border-bottom: 1px solid #eee;
+}
+.logout {
+  font-size:1em; 
+  color:white
+}
+/*
+ * Sidebar
+ */
+
+.sidebar {
+  position: fixed !important;
+  top: 55px;
+  bottom: 0;
+  left: 0;
+  z-index: 1000;
+  padding: 20px;
+  overflow-x: hidden;
+  overflow-y: auto; /* Scrollable contents if viewport is shorter than content. */
+  border-right: 1px solid #eee;
+}
+body {
+  padding-top:55px;
+}
+/* Sidebar navigation */
+.sidebar {
+  padding-left: 0;
+  padding-right: 0;
+}
+
+.sidebar .nav {
+  margin-bottom: 20px;
+}
+
+.sidebar .nav-item {
+  width: 100%;
+}
+
+.sidebar .nav-item .sub-link {
+  list-style: none;
+  margin:0;
+  padding: 0
+}
+.sidebar .nav-item .sub-link li {
+  padding-left:1em
+}
+.sidebar .nav-item + .nav-item {
+  margin-left: 0;
+}
+
+.sidebar .nav-link {
+  border-radius: 0;
+}
+
+/*
+ * Dashboard
+ */
+
+ /* Placeholders */
+.placeholders {
+  padding-bottom: 3rem;
+}
+
+.placeholder img {
+  padding-top: 1.5rem;
+  padding-bottom: 1.5rem;
+}
+
+.post-action {
+  font-size: 0.7rem
+}
+ul.categories_listing {
+  padding:0px;
+  margin: 0px;
+}
+ul.categories_listing li {
+  list-style: none;
+  padding: 5px 0px;
+}
+
+.alert_position {
+  position: absolute;
+  margin-left: auto;
+  margin-right: auto;
+  left: 0;
+  right: 0;
+}
