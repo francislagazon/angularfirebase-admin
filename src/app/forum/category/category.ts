@@ -1,4 +1,4 @@
-import { Component, Input } from "@angular/core";
+import { Component, EventEmitter } from "@angular/core";
 import * as firebase from 'firebase/app';
 import { Router} from '@angular/router';
 
@@ -25,54 +25,47 @@ export class Category {
     category_name: string;
     categories: CATEGORIES = [];
 
+    page = 1;
     pager: any = {};
     pagedItems: any[];
     pageSize: number;
-    nooflist: number = 5;
+    nooflist: number = 2;
 
     alerts: IAlert = {
         message: '',
         type: '',
         active: false
     }
-
+    category : CATEGORY = { 
+        function: '', 
+        id: '', 
+        name: '',
+        description: '',
+        uid: '',
+        
+    };
     constructor(
         private api: ApiService,
         public forum: ForumService,
         public user: UserService,
         private router: Router,
         private shared: SharedService) {
+
+            this.api.setBackendUrl( 'https://us-central1-forum-test-9f0a8.cloudfunctions.net/categoryApi' );
             this.listenCategory();
+
     }
 
-    /* 
-    *   Create Category
-    *
-    */
+    checkEdit() {
+        // CHECK IF THE USER IS ADMIN
 
-    onClickCreateCategory() {
-        console.log(`Create: ${this.category_name}`);
-        // let category = { id: this.category_id, name: this.category_name };
-        // this.forum.createCategory(category)
-        //     .then( id => { } )
-        //     .catch( e => {
-        //         this.alerts.active = true;
-        //         this.alerts.message = 'Category Exist';
-        //         this.alerts.type = "danger";  
-        //     });
-
-        
-        let category = { function: 'create', id: this.category_id, name: this.category_name, uid: this.user.uid };
-        this.api.setBackendUrl( 'https://us-central1-forum-test-9f0a8.cloudfunctions.net/categoryApi' );
-        this.api.post( category ).subscribe( key => {
-        
-            console.log(key);
-
-        }, e => {
-           
-        });
+        if(this.user.isAdmin !== true) {
+            this.alerts.active = true;
+            this.alerts.message = `Only Administrator can access this page`;
+            this.alerts.type = "danger";
+            return false
+        } else return true
     }
-
     /* 
     *   List All Categories
     *   Pagination
@@ -97,6 +90,28 @@ export class Category {
         .then(categories => this.categories)
         .catch(e => this.category_error = e.message);
     }
+
+    /* 
+    *   Create Category
+    *
+    */
+
+    onClickCreateCategory() {
+
+        if( this.checkEdit() === false ) return ;
+        console.log(`Create: ${this.category_name}`);
+        
+        this.category.function = 'create';
+        this.category.id = this.category_id;
+        this.category.name = this.category_name;
+        this.category.uid = this.user.uid;
+
+        this.api.post( this.category ).subscribe( key => { }, e => {
+            this.alerts.active = true;
+            this.alerts.message = 'Category is already Exist';
+            this.alerts.type = "danger";
+        });
+    }
     
     /* 
     *   Edit Category by ID
@@ -104,20 +119,30 @@ export class Category {
     */
 
     onClickCategoryEdit( id: string ) {
-        let cat = this.categories.find(v => v.id == id);
-        let category = { 
-            id: cat.id, 
-            name: cat['name'], 
-            description: cat['description'] 
-        };
 
-        this.forum.editCategory(category)
-            .then(id => {
-                this.alerts.active = true;
-                this.alerts.message = `ID #${id} has been updated`;
-                this.alerts.type = "success";
-            })
-        .catch(e => this.category_error = e.message);
+        if( this.checkEdit() === false ) return ;
+       
+        let cat = this.categories.find(v => v.id == id);
+        console.log("cat", this.categories);
+        
+        this.category.function = 'edit';
+        this.category.id = cat.id;
+        this.category.name = cat['name'];
+        this.category.description = cat['description'];
+        this.category.uid = this.user.uid;
+
+        this.api.post( this.category ).subscribe( key => {
+        
+            this.alerts.active = true;
+            this.alerts.message = `ID #${id} has been updated`;
+            this.alerts.type = "success";
+
+        }, e => {
+            this.alerts.active = true;
+            this.alerts.message = e.message;
+            this.alerts.type = "danger";
+        });
+
     } 
 
     /* 
@@ -126,13 +151,22 @@ export class Category {
     */
 
     onClickCategoryDelete( id: string ) {
-        this.forum.deleteCategory(id)
-        .then(() => {
+
+        this.category.function = 'delete';
+        this.category.id = id;
+        this.category.uid = this.user.uid;
+
+        this.api.post( this.category ).subscribe( key => {
+        
             this.alerts.active = true;
             this.alerts.message = `ID #${id} has been deleted`;
             this.alerts.type = "success";
-         })
-        .catch(e => this.category_error = e.message);
+
+        }, e => {
+            this.alerts.active = true;
+            this.alerts.message = e.message;
+            this.alerts.type = "danger";
+        });
     }
 
     /* 
@@ -145,10 +179,16 @@ export class Category {
         if (page < 1 || page > this.pager.totalPages) {
             return;
         }
+        this.pageSize = this.categories.length;
+        console.log("Length", this.categories.length);
+        console.log("Page", page);
+        console.log("No of List", this.nooflist);
         this.pager = this.shared.getPager(this.categories.length, page, this.nooflist);
         this.pagedItems = this.categories.slice(this.pager.startIndex, this.pager.endIndex + 1);
     }
-
+    setPage2($event) {
+        console.log($event);
+    }
     /* 
     *   Close Active Notification / Alert
     *

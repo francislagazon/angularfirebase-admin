@@ -19,7 +19,6 @@ import { Sidebar } from './layout/sidebar/sidebar';
 
 import { Dashboard } from './forum/dashboard/dashboard';
 import { Category } from './forum/category/category';
-import { Config } from './forum/config/config';
 
 import { SharedService } from './provider/shared.service';
 
@@ -32,7 +31,6 @@ import { FirebaseBackendModule } from './../firebase-backend/firebase-backend.mo
 const appRoutes:Routes = [
   { path: "", component: Dashboard },
   { path: "category", component: Category },
-  { path: "config", component: Config },
   { path: "users", component: UserComponent },
   { path: "users/trash", component: Trash }
 ];
@@ -44,7 +42,6 @@ const appRoutes:Routes = [
     Sidebar,
     Dashboard,
     Category,
-    Config,
     UserComponent,
     UserEditForm,
     Trash

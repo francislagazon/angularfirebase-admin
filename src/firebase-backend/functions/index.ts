@@ -31,7 +31,6 @@ exports.postApi = functions.https.onRequest((req, res) => {
 exports.categoryApi = functions.https.onRequest((req, res) => {
 
   cors(req, res, () => {
-    console.log("postApi() begins!");
     let forum = new Forum(db.ref('/'));
     //res.send( JSON.stringify( req.body ) + JSON.stringify( req.params ) + JSON.stringify( req.query ) );
     forum.categoryApi(req.body)

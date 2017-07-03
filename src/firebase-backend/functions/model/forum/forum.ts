@@ -485,10 +485,17 @@ export class Forum {
             else func = 'create';
         }
         
+        let data: CATEGORY = {
+            id: params['id'],
+            name: params['name'],
+            description: params["description"],
+            uid: params['uid']
+        }
+
         switch ( func ) {
-            case 'create': return this.createCategory(params);
-            case 'edit': return this.editCategory(params);
-            case 'delete': return this.deleteCategory(params);
+            case 'create': return this.createCategory(data);
+            case 'edit': return this.editCategory(data);
+            case 'delete': return this.deleteCategory(data.id);
             default: return this.error(ERROR.unknown_function);
         }
 

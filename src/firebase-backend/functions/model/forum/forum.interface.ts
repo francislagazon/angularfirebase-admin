@@ -3,11 +3,11 @@ export const POST_DATA_PATH = 'forum/post/data';
 export const CATEGORY_POST_RELATION_PATH = 'forum/category-post-relation';
 export const ALL_CATEGORIES = 'all-categories';
 
-export interface CATEGORY {
+export interface CATEGORY extends REQUEST {
     id: string;
     name?: string;
     description?: string;
-    owner?: string;
+    uid?: string;
 }
 
 export type CATEGORIES = Array<CATEGORY>;
