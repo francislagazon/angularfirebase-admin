@@ -5,9 +5,10 @@ import { Router} from '@angular/router';
 import { SharedService, IAlert } from './../../provider/shared.service';
 
 import {
-  UserService,
-  CATEGORY, CATEGORIES,
-  ForumService
+    ApiService,
+    UserService,
+    CATEGORY, CATEGORIES,
+    ForumService
 } from './../../../firebase-backend/firebase-backend.module';
 
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
@@ -36,6 +37,7 @@ export class Category {
     }
 
     constructor(
+        private api: ApiService,
         public forum: ForumService,
         public user: UserService,
         private router: Router,
@@ -50,14 +52,25 @@ export class Category {
 
     onClickCreateCategory() {
         console.log(`Create: ${this.category_name}`);
-        let category = { id: this.category_id, name: this.category_name };
-        this.forum.createCategory(category)
-            .then( id => { } )
-            .catch( e => {
-                this.alerts.active = true;
-                this.alerts.message = 'Category Exist';
-                this.alerts.type = "danger";  
-            });
+        // let category = { id: this.category_id, name: this.category_name };
+        // this.forum.createCategory(category)
+        //     .then( id => { } )
+        //     .catch( e => {
+        //         this.alerts.active = true;
+        //         this.alerts.message = 'Category Exist';
+        //         this.alerts.type = "danger";  
+        //     });
+
+        
+        let category = { function: 'create', id: this.category_id, name: this.category_name, uid: this.user.uid };
+        this.api.setBackendUrl( 'https://us-central1-forum-test-9f0a8.cloudfunctions.net/categoryApi' );
+        this.api.post( category ).subscribe( key => {
+        
+            console.log(key);
+
+        }, e => {
+           
+        });
     }
 
     /* 
