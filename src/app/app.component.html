@@ -1,12 +1,15 @@
-<app-header></app-header>
+<div class="container-fluid">
 
-<div class="row" *ngIf=" user.isLogged ">
-<nav class="col-sm-3 col-md-2 hidden-xs-down bg-faded sidebar">  
-  <app-sidebar></app-sidebar>
-</nav>
-<main class="col-md-10 pt-3 ml-auto" >
+  <app-header></app-header>
 
-<router-outlet></router-outlet>
+  <div class="row" *ngIf=" user.isLogged ">
+    <nav class="col-sm-3 col-md-2 hidden-xs-down bg-faded sidebar">  
+    <app-sidebar></app-sidebar>
+    </nav> <!-- END NAV -->
 
-</main>
-</div>
+    <main class="col-md-10 pt-3 ml-auto" >
+      <router-outlet></router-outlet>
+    </main> <!-- END MAIN -->
+  </div> <!-- END ROW -->
+
+</div> <!-- END CONTAINER-FLUID -->

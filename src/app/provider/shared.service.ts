@@ -1,15 +1,15 @@
 import { Injectable } from '@angular/core';
-import * as _ from 'underscore';
+import { ERROR } from './../../firebase-backend/functions/model/error/error';
 
 export interface IAlert {
-    type: string;
+    type?: string;
     message: string;
-    active: boolean
+    active?: boolean
 }
 
 @Injectable()
 export class SharedService {
-
+    
     getPager(totalItems: number, currentPage: number = 1, pageSize: number) {
 
         let totalPages = Math.ceil(totalItems / pageSize);
@@ -33,13 +33,25 @@ export class SharedService {
 
         let startIndex = (currentPage - 1) * pageSize;
         let endIndex = Math.min(startIndex + pageSize - 1, totalItems - 1);
-        let pages = _.range(startPage, endPage + 1);
  
         return {
             currentPage: currentPage,
             startIndex: startIndex,
-            endIndex: endIndex,
-            pages: pages
+            endIndex: endIndex
         };
+    }
+
+    errorWrap( error : string) {
+        /* Remove underscore  */
+        let message = ERROR[error].replace( '_' , ' ' );
+        if ( message ) {
+            let e = {
+                message: message.charAt(0).toUpperCase() + message.slice(1),
+                type: 'danger'
+            }
+            return e;
+        }
+        else return { message: "Error does not exists", type: "danger" };
+
     }
 }

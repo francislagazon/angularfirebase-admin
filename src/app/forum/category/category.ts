@@ -1,6 +1,6 @@
 import { Component, EventEmitter } from "@angular/core";
 import * as firebase from 'firebase/app';
-import { Router} from '@angular/router';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 
 import { SharedService, IAlert } from './../../provider/shared.service';
 
@@ -20,7 +20,6 @@ import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 })
 
 export class Category {
-    category_error: string;
     category_id: string;
     category_name: string;
     categories: CATEGORIES = [];
@@ -29,43 +28,47 @@ export class Category {
     pager: any = {};
     pagedItems: any[];
     pageSize: number;
-    nooflist: number = 2;
+    nooflist: number = 5;
 
-    alerts: IAlert = {
+    error: IAlert = {
         message: '',
-        type: '',
-        active: false
-    }
+        type: 'success'
+    };
+
     category : CATEGORY = { 
         function: '', 
         id: '', 
         name: '',
         description: '',
         uid: '',
-        
     };
+
+    form: FormGroup;
+
     constructor(
         private api: ApiService,
         public forum: ForumService,
         public user: UserService,
-        private router: Router,
-        private shared: SharedService) {
-
+        private shared: SharedService,
+        private fb: FormBuilder
+    ) {
+            this.initializedForm();
             this.api.setBackendUrl( 'https://us-central1-forum-test-9f0a8.cloudfunctions.net/categoryApi' );
             this.listenCategory();
-
     }
 
-    checkEdit() {
-        // CHECK IF THE USER IS ADMIN
+    /* 
+    *   Initialize the Form 
+    *
+    */
 
-        if(this.user.isAdmin !== true) {
-            this.alerts.active = true;
-            this.alerts.message = `Only Administrator can access this page`;
-            this.alerts.type = "danger";
-            return false
-        } else return true
+    initializedForm() {
+        this.form = this.fb.group({
+            id:            ['', Validators.required],
+            name:          ['', Validators.required]
+        });
     }
+
     /* 
     *   List All Categories
     *   Pagination
@@ -73,22 +76,14 @@ export class Category {
     */
 
     listenCategory() {
-        this.forum.observeCategory().subscribe(res => {
-            console.log(res);
-            this.categories = res;
-            this.setPage(1);
-        });
-    }
-
-    /* 
-    *   List All Categories
-    *
-    */
-
-    getCategories() {
         this.forum.getCategories()
-        .then(categories => this.categories)
-        .catch(e => this.category_error = e.message);
+            .then( data => {
+                this.categories = data
+                this.setPage(1);
+            })
+            .catch( e => {
+                this.error = this.shared.errorWrap(e.message);
+            });
     }
 
     /* 
@@ -98,19 +93,16 @@ export class Category {
 
     onClickCreateCategory() {
 
-        if( this.checkEdit() === false ) return ;
-        console.log(`Create: ${this.category_name}`);
+        this.forum.createCategory( { id: this.form.value.id, name: this.form.value.name, uid: this.user.uid } )
+        .then( key => {
+            this.initializedForm();
+            this.error.message = "Success!!!";
+            this.listenCategory()
+        } )
+        .catch( e => {
+            this.error = this.shared.errorWrap(e.message);
+        } )
         
-        this.category.function = 'create';
-        this.category.id = this.category_id;
-        this.category.name = this.category_name;
-        this.category.uid = this.user.uid;
-
-        this.api.post( this.category ).subscribe( key => { }, e => {
-            this.alerts.active = true;
-            this.alerts.message = 'Category is already Exist';
-            this.alerts.type = "danger";
-        });
     }
     
     /* 
@@ -119,30 +111,17 @@ export class Category {
     */
 
     onClickCategoryEdit( id: string ) {
-
-        if( this.checkEdit() === false ) return ;
        
         let cat = this.categories.find(v => v.id == id);
-        console.log("cat", this.categories);
-        
-        this.category.function = 'edit';
-        this.category.id = cat.id;
-        this.category.name = cat['name'];
-        this.category.description = cat['description'];
-        this.category.uid = this.user.uid;
 
-        this.api.post( this.category ).subscribe( key => {
-        
-            this.alerts.active = true;
-            this.alerts.message = `ID #${id} has been updated`;
-            this.alerts.type = "success";
-
-        }, e => {
-            this.alerts.active = true;
-            this.alerts.message = e.message;
-            this.alerts.type = "danger";
-        });
-
+        this.forum.editCategory( { id: cat.id, name: cat['name'], description: cat['description'], uid: this.user.uid } )
+        .then( key => {
+            this.error.message = "Successfully Save!!!";
+            this.listenCategory()
+        } )
+        .catch( e => {
+            this.error = this.shared.errorWrap(e.message);
+        } )
     } 
 
     /* 
@@ -152,21 +131,15 @@ export class Category {
 
     onClickCategoryDelete( id: string ) {
 
-        this.category.function = 'delete';
-        this.category.id = id;
-        this.category.uid = this.user.uid;
+        this.forum.deleteCategory( id )
+        .then( () => {
+            this.error.message = "Successfully Deleted!!!";
+            this.listenCategory() 
+        } )
+        .catch( e => {
+            this.error = this.shared.errorWrap(e.message);
+        } )
 
-        this.api.post( this.category ).subscribe( key => {
-        
-            this.alerts.active = true;
-            this.alerts.message = `ID #${id} has been deleted`;
-            this.alerts.type = "success";
-
-        }, e => {
-            this.alerts.active = true;
-            this.alerts.message = e.message;
-            this.alerts.type = "danger";
-        });
     }
 
     /* 
@@ -179,22 +152,17 @@ export class Category {
         if (page < 1 || page > this.pager.totalPages) {
             return;
         }
-        this.pageSize = this.categories.length;
-        console.log("Length", this.categories.length);
-        console.log("Page", page);
-        console.log("No of List", this.nooflist);
+
         this.pager = this.shared.getPager(this.categories.length, page, this.nooflist);
         this.pagedItems = this.categories.slice(this.pager.startIndex, this.pager.endIndex + 1);
     }
-    setPage2($event) {
-        console.log($event);
-    }
+
     /* 
     *   Close Active Notification / Alert
     *
     */
 
     closeAlert() {
-        this.alerts.active = false;
+        this.error.message = null;
     }
 }

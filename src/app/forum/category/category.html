@@ -1,14 +1,16 @@
 <div class="container">
-  <div class="row alert_position" *ngIf="alerts.active">
-    <ngb-alert [type]="alerts.type" class="ml-auto mr-auto" (close)="closeAlert()">{{ alerts.message }}</ngb-alert>
+  <div class="row alert_position" *ngIf="error.message">
+    <ngb-alert [type]="error.type" class="ml-auto mr-auto" (close)="closeAlert()">{{ error.message }}</ngb-alert>
   </div>  
   <div class="row">
     <h5 class="w-100">Forum Categories</h5>
     <div class="form-group float-left">
+    <form [formGroup]="form" class="m-4 w-100" (submit)="onClickCreateCategory()">  
     Create a forum category:
-    <input name="category_id" [(ngModel)]="category_id" placeholder="Category ID">
-    <input name="category_name" [(ngModel)]="category_name" placeholder="Category Name">
-    <button type="button" class="btn btn-primary" (click)="onClickCreateCategory()">Submit</button>
+    <input name="id" formControlName="id" placeholder="Category ID">
+    <input name="name" formControlName="name" placeholder="Category Name">
+    <button type="submit" class="btn btn-primary">Submit</button>
+    </form>
     </div>
     <div class="float-right ml-auto">
     <p class="d-inline-block">Filter by: </p> 
@@ -39,6 +41,7 @@
         <td><button type="button" class="btn btn-primary" (click)="onClickCategoryEdit( c.id )">SAVE</button></td>
       </tr>
     </table>
-    <ngb-pagination [collectionSize]="pageSize" [(page)]="page" [pageSize]="nooflist" (pageChange)="setPage( page )"></ngb-pagination>
+    <ngb-pagination [collectionSize]="categories.length" [(page)]="page" [pageSize]="nooflist" (pageChange)="setPage( page )"></ngb-pagination>
+
   </div>
 </div>

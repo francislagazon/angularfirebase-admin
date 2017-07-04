@@ -20,6 +20,7 @@ export class UserComponent {
     trash: boolean = false;
 
     users: USERS = [];
+    page = 1;
     pager: any = {};
     pagedItems: any[];
     pageSize: number;
@@ -33,11 +34,10 @@ export class UserComponent {
         email: ''
     }
 
-    alerts: IAlert = {
+    error: IAlert = {
         message: '',
-        type: '',
-        active: false
-    }
+        type: 'success'
+    };
 
     constructor(
         public user: UserService, 
@@ -81,11 +81,7 @@ export class UserComponent {
         .open( UserEditForm );
         this.modalRef.componentInstance['option'] = user;
 
-        this.modalRef.result.then((res)=> {
-           this.loadUsers();
-        }, reason => {
-            console.log(reason)
-        });
+        this.modalRef.result.then( (res) => { }, reason => { } );
 
     }
 
@@ -100,15 +96,13 @@ export class UserComponent {
         }
         this.user.editUser(key, data)
         .then(res => {
-            
             // Success will reload Users listing and show alert on the page
-
             this.loadUsers();
-            this.alerts.active = true;
-            this.alerts.message = 'User has been moved to the trash';
-            this.alerts.type = "danger";
+            this.error.message = 'User has been moved to the trash';
         })
-        .catch(e => console.log(e.message))
+        .catch( e => {
+            this.error = this.shared.errorWrap( e.message );
+        } )
     }
 
     /* 
@@ -131,6 +125,6 @@ export class UserComponent {
     */
 
     closeAlert() {
-        this.alerts.active = false;
+        this.error.message = null;
     }
 }

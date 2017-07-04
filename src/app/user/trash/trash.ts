@@ -20,7 +20,7 @@ export class Trash {
     trash: boolean = true;
 
     users: USERS = [];
-
+    page = 1;
     pager: any = {};
     pagedItems: any[];
     pageSize: number;
@@ -34,11 +34,11 @@ export class Trash {
         email: ''
     }
 
-    alerts: IAlert = {
+    error: IAlert = {
         message: '',
-        type: '',
-        active: false
-    }
+        type: 'success'
+    };
+
     constructor(
         public user: UserService, 
         private shared: SharedService, 
@@ -81,11 +81,7 @@ export class Trash {
         .open( UserEditForm );
         this.modalRef.componentInstance['option'] = user;
 
-        this.modalRef.result.then((res)=> {
-           this.loadUsers();
-        }, reason => {
-            console.log(reason)
-        });
+        this.modalRef.result.then( (res) => { }, reason => { } );
 
     }
 
@@ -94,20 +90,19 @@ export class Trash {
     *
     */
 
-    onClickRestore( key ) {
+    onClickRestore( key : string) {
         let data: USER = {
             trash: false
         }
         this.user.editUser(key, data)
         .then(res => {
-            
             // Success will reload Users listing and show alert on the page
             this.loadUsers();
-            this.alerts.active = true;
-            this.alerts.message = 'User has been restored';
-            this.alerts.type = "success";
+            this.error.message = 'User has been moved to the trash';
         })
-        .catch(e => console.log(e.message))
+        .catch( e => {
+            this.error = this.shared.errorWrap( e.message );
+        } )
     }
 
     /* 
@@ -131,6 +126,6 @@ export class Trash {
     */
     
     closeAlert() {
-        this.alerts.active = false;
+        this.error.message = null;
     }
 }

@@ -1,8 +1,6 @@
 import * as firebase from 'firebase/app';
 import { ERROR } from '../error/error';
 
-
-
 import {
     CATEGORY_PATH, CATEGORY, CATEGORIES, POST,
     POST_DATA_PATH, CATEGORY_POST_RELATION_PATH, ALL_CATEGORIES
