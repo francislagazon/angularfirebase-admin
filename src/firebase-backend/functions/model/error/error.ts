@@ -25,6 +25,7 @@ export const ERROR = {
     requeset_data_is_empty: 'requeset_data_is_empty',
     uid_is_empty: 'uid_is_empty',
     user_id_empty: 'user_id_empty',
+    user_exist: 'user_exist',
     user_not_exist: 'user_not_exist',
     user_data_empty: 'user_data_empty',
     post_not_found_by_that_key: 'post_not_found_by_that_key',
@@ -32,7 +33,9 @@ export const ERROR = {
     json_parse: 'json_parse',
     disconnected: 'disconnected',
     response_is_empty: 'response_is_empty',
-    permission_denied: 'permission_denied'
+    permission_denied: 'permission_denied',
+    secret_is_empty: 'secret_is_empty',
+    secret_does_not_match: 'secret_does_not_match'
 };
 
 

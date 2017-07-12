@@ -10,12 +10,13 @@ import {
     USERS_PATH, USER, USERS, USER_REGISTER, USER_REGISTER_RESONSE
 } from './../../model/user/user.interface';
 
+import { Base } from './../base/base';
 
-export class Forum {
+export class Forum extends Base {
     debugPath: string = ''; // debug path.
     lastErrorMessage: string = '';
     constructor(public root: firebase.database.Reference) {
-
+        super();
     }
 
     get getLastErrorMessage(): string {
@@ -202,6 +203,9 @@ export class Forum {
         if ( post.key ) return this.error( ERROR.post_key_exists_on_create );
         await this.categoriesExist(post.categories);
         let ref = this.postData().push();
+
+        delete post.secret;
+
         return this.setPostData(ref, post);
     }
 
@@ -365,9 +369,9 @@ export class Forum {
             /**
              * Does not save uid here since 'uid' cannot be trusted as of Jun 16, 2017.
              */
-            await this.categoryPostRelation.child(category).child(key).set(true);
+            await this.categoryPostRelation().child(category).child(key).set(true);
         }
-        await this.categoryPostRelation.child(ALL_CATEGORIES).child(key).set(true);
+        await this.categoryPostRelation().child(ALL_CATEGORIES).child(key).set(true);
     }
 
     /**
@@ -380,30 +384,48 @@ export class Forum {
     async deleteCategoryPostRelation( key, categories ) {
         if ( categories && categories.length  ) {
             for (let category of categories) {
-                await this.categoryPostRelation.child( category ).child(key).set( null );
+                await this.categoryPostRelation().child( category ).child(key).set( null );
             }
-            await this.categoryPostRelation.child(ALL_CATEGORIES).child(key).set( null );
+            await this.categoryPostRelation().child(ALL_CATEGORIES).child(key).set( null );
         }
     }
 
 
 
-    page(o) {
-        let $ref = this.postData().orderByKey().limitToLast(o.size);
+    page(o): firebase.Promise<any> {
+        let ref = o['ref'] ? o['ref'] : this.postData();
+        let size = o['size'] ? o['size'] : 10;
 
-        return $ref
+        let q = ref.orderByKey();
+        if (o['key']) q = q.endAt(o['key']);
+        q = q.limitToLast(size);
+
+        return q
             .once('value')
             .then(s => {
-                let objects = s.val();
                 let posts = [];
-                for (let k of Object.keys(objects).reverse()) {
-                    posts.push(objects[k]);
+                let objects = s.val();
+                
+                if (objects === null) return posts;
+                for (let k of Object.keys(objects)) {
+                    if (o['keyOnly']) posts.push(k);
+                    else posts.push(objects[k]);
                 }
                 return posts;
             });
-
     }
-
+    pageHelper(o, posts: Array<string>) {
+        let obj = {
+            posts: posts
+        };
+        if (posts) {
+            if (posts.length > 1) {
+                if (posts.length == o.size) posts.pop();
+                obj.posts = posts;
+            }
+        }
+        return obj;
+    }
 
     /**
      * 
@@ -445,13 +467,15 @@ export class Forum {
     get postDataPath(): string {
         return this.path(POST_DATA_PATH);
     }
-    get categoryPostRelation(): firebase.database.Reference {
-        return this.root.ref.child(this.categoryPostRelationPath);
+
+    categoryPostRelation(category?: string): firebase.database.Reference {
+        if (this.isEmpty(category)) return this.root.ref.child(this.categoryPostRelationPath);
+        else return this.root.child(this.categoryPostRelationPath).child(category);
     }
+
     get categoryPostRelationPath(): string {
         return this.path(CATEGORY_POST_RELATION_PATH);
     }
-
 
 
     path(p: string) {
@@ -463,7 +487,7 @@ export class Forum {
 
     ////////////////////////////////////
     ////
-    ////    POST
+    ////    Category
     ////
     ////////////////////////////////////
 
@@ -514,23 +538,31 @@ export class Forum {
         
 
         if ( ! params['uid'] ) return this.error(ERROR.uid_is_empty);
+        if( ! params['secret'] ) return this.error(ERROR.secret_is_empty)
+        
         if (this.checkKey(params.uid)) return this.error(ERROR.malformed_key);
 
         var func = '';
         if ( params['function'] ) func = params['function'];
-        else {
-            if ( params['key'] ) func = 'edit';
-            else func = 'create';
-        }
+        else return this.error(ERROR.unknown_function);
         
-        switch ( func ) {
-            case 'create': return this.createPost(params);
-            case 'edit': return this.editPost(params);
-            case 'delete': return this.deletePost(params);
-            default: return this.error(ERROR.unknown_function);
-        }
-
-
+        return this.getSecretKey(params.uid)
+            .then(key => {          /// secret key check for security.
+                if (key === params['secret']) {
+                    return key;
+                }
+                else return this.error(ERROR.secret_does_not_match);
+            })
+            .then(key => {
+                switch ( func ) {
+                    case 'create': return this.createPost(params);
+                    case 'edit': return this.editPost(params);
+                    case 'delete': return this.deletePost(params);
+                    default: return this.error(ERROR.unknown_function);
+                }
+            })
+            .catch(e => console.log(e.message));
+            
     }
 
 

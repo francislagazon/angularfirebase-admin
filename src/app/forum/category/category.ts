@@ -53,7 +53,6 @@ export class Category {
         private fb: FormBuilder
     ) {
             this.initializedForm();
-            this.api.setBackendUrl( 'https://us-central1-forum-test-9f0a8.cloudfunctions.net/categoryApi' );
             this.listenCategory();
     }
 
@@ -152,7 +151,6 @@ export class Category {
         if (page < 1 || page > this.pager.totalPages) {
             return;
         }
-
         this.pager = this.shared.getPager(this.categories.length, page, this.nooflist);
         this.pagedItems = this.categories.slice(this.pager.startIndex, this.pager.endIndex + 1);
     }

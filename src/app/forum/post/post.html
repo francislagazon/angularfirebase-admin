@@ -1,0 +1,86 @@
+    <div class="col-6 ml-auto mr-auto pb-5">
+    <div class="card">
+        <div class="card-block px-2">
+
+            <form [formGroup]="form" (ngSubmit)="onSubmitPostForm()">
+            <div class="form-group">
+                <label for="inputName">Post Title</label>
+                <input type="text" class="form-control" id="inputName" formControlName="subject" placeholder="Title" required>
+            </div>
+            <div class="form-group">
+                <label for="inputContent">Content</label>
+                <textarea class="form-control" name="content" id="inputContent" formControlName="content" rows="10"  required></textarea>
+            </div>
+        
+            <div class="form-check bg-faded py-3 px-3" >
+                <h6>Categories</h6>
+                <ul class="categories_listing">
+                    <li *ngFor=" let c of categories; let i = index; ">
+                        <label class="form-check-label mx-2">
+
+                        <input type="checkbox"
+                        value="{{ c.id }}"
+                        (change)=" onChangeFormCategory( $event ) ">
+                        {{ c['name'] }}
+                        </label>
+                    </li>
+                </ul>
+            </div>
+            <div class="form-check">
+                <div class="alert alert-danger" role="alert" *ngIf="postError.message">
+                    <strong>Oh snap!</strong> {{ postError.message }}
+                </div>
+                <button type="submit" class="btn btn-primary float-right">Publish</button>
+            </div>
+
+            </form>
+
+        </div> 
+    </div>
+    
+    </div>
+    <div class="col-6 ml-auto mr-auto">
+        <h2>Post</h2>
+    <div class="p-2" style="overflow:hidden">
+        <button class="text-center" [routerLink]="['/post']" >All</button> 
+        <ng-container *ngFor=" let p of categories;">
+            <button class="text-center" [routerLink]="['/post', p.id]" value="{{p.name}}">{{p.name}}</button>
+        </ng-container>
+    </div>
+    <ng-container *ngIf="loaderImg">
+        <i class="fa fa-cog fa-spin fa-3x fa-fw text-center pt-5 pb-5"></i> Loading...
+    </ng-container>
+    <div class="card mb-2" style="overflow:hidden" *ngFor="let post of postKeys">
+        <div class="card-block" *ngIf="postData[post]">
+            <div class="px-2" style="position:relative">
+                <div *ngIf="postData[post] && postData[post].uid == user.uid" style="position:absolute; right:0px">
+                    <div class="postEdit">
+                    <a (click)="onClickEdit(postData[post])">Edit</a> | <a (click)="onClickDelete(postData[post])">Delete</a>
+                    </div>
+                </div>
+            <h4 class="card-title">{{ postData[post].subject }}</h4>
+            <p class="card-text">{{ postData[post].content }}</p>
+            <span *ngIf="postData[post].name" class="d-block ml-auto font-1">Author: {{ postData[post].name }} </span>
+            <span class="d-block ml-auto font-1">Date Posted: {{ postData[post].stamp }}</span>
+            <span class="d-block ml-auto font-1">Category: {{ postData[post].categories }}</span>
+            </div>
+        </div>
+        <div class="card-footer">
+            <div class="row mt-2">
+                <div class="col">
+                    <i class="fa fa-thumbs-up" aria-hidden="true"></i> Like
+                </div>
+                <div class="col">
+                    <i class="fa fa-comment" aria-hidden="true" [routerLink]="['comment', post.key]"></i>  Comment
+                </div>
+            </div>
+        </div>
+    </div>
+    <div *ngIf="!postKeys.length && !loaderImg">
+            No Post Found
+        </div>
+    <!--<div *ngIf="posts.length">
+        <ngb-pagination [collectionSize]="posts.length" [(page)]="page" [pageSize]="nooflist" (pageChange)="setPage( page )"></ngb-pagination>
+    </div>-->
+    </div>
+    

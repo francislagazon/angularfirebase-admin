@@ -18,7 +18,7 @@ export { UserData } from './functions/model/user/user';
 
 
 export { CATEGORY, CATEGORIES, POST, POSTS, ALL_CATEGORIES } from './functions/model/forum/forum.interface';
-export { USER, USERS} from './functions/model/user/user.interface';
+export { USER, USERS } from './functions/model/user/user.interface';
 
 import { UserService } from './functions/model/user/user.service';
 export { UserService } from './functions/model/user/user.service';

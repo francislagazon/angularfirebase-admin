@@ -1,4 +1,5 @@
-export const USERS_PATH = 'users';
+export const USERS_PATH = 'user/profile';
+export const USERS_SECRET_PATH = 'user/secret';
 
 interface USER_COMMON {
     key?: string;
@@ -7,7 +8,8 @@ interface USER_COMMON {
     email?: string;
     displayName?: string;
     stamp?: number;
-    photoUrl?: string;
+    photoURL?: string;
+    providerId?: string;
     trash?: boolean;
 }
 
@@ -19,6 +21,5 @@ export interface USER_REGISTER {
 }
 
 export interface USER_REGISTER_RESONSE {}
-
 export interface USER extends USER_COMMON {};
 export type USERS = Array<USER>;

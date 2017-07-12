@@ -5,37 +5,47 @@ import * as firebase from 'firebase';
 import { Observable } from 'rxjs/Observable';
 import 'rxjs/add/observable/fromPromise';
 import 'rxjs/add/observable/throw';
-import { Router} from '@angular/router';
 import { ERROR } from '../error/error';
 import { UserData } from './user';
+import { Base } from './../base/base'
 import {
     USERS_PATH, USER, USERS, USER_REGISTER, USER_REGISTER_RESONSE
 } from './user.interface';
 
 
 @Injectable()
-export class UserService extends UserData {
+export class UserService extends Base {
     auth: firebase.auth.Auth;
     private _isAdmin: boolean = false;
     root: firebase.database.Reference;
     debugPath: string = '';
     lastErrorMessage: string = '';
+    profile: USER;
+    secretKey: string;
+
     constructor(
-        
         private angularFireAuth: AngularFireAuth,
-        private angularFireDatabase: AngularFireDatabase,
-        private router: Router
     ) {
-        super( angularFireDatabase.database.ref('/'));
+        super();
+        this.root = firebase.database().ref('/');
         this.auth = angularFireAuth.auth;
          
         /**
          * For admin check.
-         */
+         */-
         this.auth.onAuthStateChanged( (user: firebase.User) => {
             console.log("Auth state changed");
             if ( user ) {
-                console.log("User logged in");
+                console.log("User logged in ");
+
+                this.getOrGenerateSecretKey()
+                    .then(key => {
+                        console.log("Got Secret Key: ", key);
+                        this.secretKey = key;
+                    })
+                    .catch(e => console.error(e));
+
+                this.setProfile(user.uid, user.providerData);
             }
             else {
                 console.log("User logged out");
@@ -47,7 +57,7 @@ export class UserService extends UserData {
 
 
     }
-
+    
     path(p: string) {
         p = this.debugPath + p;
         // console.log(`path: ${p}`);
@@ -106,19 +116,20 @@ export class UserService extends UserData {
     create(data: USER_REGISTER): Promise<firebase.User> {
         return <Promise<firebase.User>><any>this.auth.createUserWithEmailAndPassword(data.email, data.password);
     }
-
-    update(user: firebase.User, data: USER_REGISTER ) : firebase.Promise<void> {
-        return user.updateProfile({
-                    displayName: data.displayName,
-                    photoURL: data.photoUrl
-                });
-    }
     
     editUser(key: string, data: USER): firebase.Promise<any> {
         if (this.isEmpty(key)) return this.error(ERROR.user_id_empty);
         if (this.checkKey(key)) return firebase.Promise.reject(new Error(ERROR.malformed_key));
         return this.userExists(key).then(re => {
             return this.setUser(key, data);
+        });
+    }
+
+    editProfile(data: USER): firebase.Promise<any> {
+        if (this.isEmpty(data.key)) return this.error(ERROR.user_id_empty);
+        if (this.checkKey(data.key)) return firebase.Promise.reject(new Error(ERROR.malformed_key));
+        return this.userExists(data.key).then(re => {
+            return this.setUser(data.key, data);
         });
     }
 
@@ -142,23 +153,6 @@ export class UserService extends UserData {
 
         // console.log("edit Category data: ", data);
         return this.userData(key).update(data).then(() => key);
-    }
-
-    /**
-     * 
-     * @note Callback style function
-     * 
-     * @param data - user registration data.
-     * @param success 
-     * @param error 
-     */
-    register( data: USER_REGISTER, success, error ) {
-
-        this.create( data )
-            .then( user => this.update( user, data ) )
-            .then( success )
-            .catch( error );
-
     }
 
     logout() {
@@ -193,7 +187,7 @@ export class UserService extends UserData {
             .then(s => {
                 if (s.val()) return true;
                 else {
-                    this.setLastErrorMessage(`Category ${user} does not exist.`);
+                    this.setLastErrorMessage(`User ${user} does not exist.`);
                     return firebase.Promise.reject(new Error(ERROR.user_not_exist));
                 }
             });
@@ -216,6 +210,18 @@ export class UserService extends UserData {
          });
     }
 
+    /**
+     * @see readme#Security
+     * 
+     * After login, the user would get or generate secret key.
+     * @note if there is no secret key, then create one. 
+     * Reference Updated firebase-backend 
+     * 
+     */
+    getOrGenerateSecretKey(): firebase.Promise<any> {
+        return this.generateSecretKey(this.uid);
+    }
+    
     /**
      * 
      * Turns undefined into null to avoid "first argument contains undefined in property firebase" error.
@@ -240,5 +246,40 @@ export class UserService extends UserData {
         // console.log('------> ERROR: ', m);
     }
 
+    setProfile(key, data?): firebase.Promise<any> {
+        
+        if (this.checkKey(key)) return firebase.Promise.reject(new Error(ERROR.malformed_key));
+        return this.userExists(key).then(re => {
+            throw new Error(ERROR.user_exist);
+        })
+        .catch(e => {
+            if(e.message == ERROR.user_not_exist) {
+
+                if(data.length <= 1) {
+                    data.forEach(user => { 
+                        this.profile = user;
+                    });
+                }
+                this.profile.key = key;
+                this.profile.trash = false;
+
+                this.setUser(key, this.profile)
+                .then( res => console.log( res ) )
+                .catch( e => console.log(e.message) )
+            }
+            if(e.message == ERROR.user_exist) {
+                return this.userData(key).once("value")
+                    .then( s => {
+                        this.profile = s.val();
+                        return this.profile;
+                    })
+                    .catch(e => console.log( e.message ) )
+                
+            }
+
+            
+            
+        }) 
+    }
 
 }

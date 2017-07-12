@@ -13,12 +13,15 @@ import { AngularFireDatabaseModule } from 'angularfire2/database';
 import { UserComponent } from './user/user';
 import { UserEditForm } from './user/modal/user.edit.form';
 import { Trash } from './user/trash/trash';
+import { Profile } from './user/profile/profile';
 
 import { Header } from './layout/header/header';
 import { Sidebar } from './layout/sidebar/sidebar';
 
 import { Dashboard } from './forum/dashboard/dashboard';
 import { Category } from './forum/category/category';
+import { PostComponent } from './forum/post/post';
+import { PostEditForm } from './forum/post/modal/post.edit.form';
 
 import { SharedService } from './provider/shared.service';
 
@@ -31,8 +34,11 @@ import { FirebaseBackendModule } from './../firebase-backend/firebase-backend.mo
 const appRoutes:Routes = [
   { path: "", component: Dashboard },
   { path: "category", component: Category },
+  { path: "post", component: PostComponent },
+  { path: "post/:category", component: PostComponent },
   { path: "users", component: UserComponent },
-  { path: "users/trash", component: Trash }
+  { path: "users/trash", component: Trash },
+  { path: "profile", component: Profile }
 ];
 
 @NgModule({
@@ -42,9 +48,12 @@ const appRoutes:Routes = [
     Sidebar,
     Dashboard,
     Category,
+    PostComponent,
+    PostEditForm,
     UserComponent,
     UserEditForm,
-    Trash
+    Trash,
+    Profile
   ],
   imports: [
     BrowserModule,
@@ -60,6 +69,6 @@ const appRoutes:Routes = [
   ],
   providers: [SharedService],
   bootstrap: [AppComponent],
-  entryComponents: [UserEditForm]
+  entryComponents: [UserEditForm, PostEditForm]
 })
 export class AppModule { }

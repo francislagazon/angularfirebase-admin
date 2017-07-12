@@ -2,11 +2,12 @@ import * as firebase from 'firebase/app';
 import { ERROR } from '../error/error';
 
 import {
-    USERS_PATH, USER, USERS, USER_REGISTER, USER_REGISTER_RESONSE
+    USERS_PATH, USERS_SECRET_PATH, USER, USERS, USER_REGISTER, USER_REGISTER_RESONSE
 } from './../../model/user/user.interface';
 
 
 export class UserData {
+    profile: USER;
     debugPath: string = ''; // debug path.
     lastErrorMessage: string = '';
     constructor(public root: firebase.database.Reference) {
@@ -67,18 +68,31 @@ export class UserData {
         return p;
     }
 
+    setLastErrorMessage(m) {
+        this.lastErrorMessage = m;
+        // console.log('------> ERROR: ', m);
+    }
+
     ////////////////////////////////////
     ////
     ////    User
     ////
     ////////////////////////////////////
 
-
-
-
-    setLastErrorMessage(m) {
-        this.lastErrorMessage = m;
-        // console.log('------> ERROR: ', m);
+    createUser(key: string, data: USER): firebase.Promise<any> {
+        if (this.checkKey(data.key)) return firebase.Promise.reject(new Error(ERROR.malformed_key));
+        return this.userExists(data.key).then(re => {
+            throw new Error(ERROR.category_exists); // 여기에 throw 하면 요 밑 .catch() 에서 받는다. 따라서 .catch() 에서 category_exist 를 받으면 에러를 리턴하고, 아니면 생성을 한다.
+        })
+            .catch(e => {
+                if (e.message == ERROR.user_not_exist) {
+                    return this.setUser(key, data);
+                }
+                if (e.message == ERROR.category_exists) {
+                    this.setLastErrorMessage(`${data.key} user already exists`);
+                }
+                throw e;
+            });
     }
 
     editUser(key: string, data: USER): firebase.Promise<any> {
@@ -135,4 +149,12 @@ export class UserData {
         return this.path(USERS_PATH);
     }
 
+    setProfile(key, data) {
+        if(data.length <= 1) {
+            data.forEach(user => {
+                this.profile = user;
+            });
+        }
+        this.profile.key = key;
+    }
 }

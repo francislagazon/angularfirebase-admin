@@ -21,10 +21,8 @@ export class Header {
 
     onClickLoginWithGoogle() {
         this.user.auth.signInWithPopup( new firebase.auth.GoogleAuthProvider() )
-            .then((res) => {
-                console.log(res);
-             })
-            .catch(e => {
+            .then( ( res ) => { })
+            .catch( e => {
                 console.log('error: ', e);
             });
     }
@@ -36,8 +34,8 @@ export class Header {
 
     onClickLoginWithFacebook() {
         this.user.auth.signInWithPopup( new firebase.auth.FacebookAuthProvider() )
-            .then((res) => { })
-            .catch(e => {
+            .then( ( res ) => { } )
+            .catch( e => {
                 console.log('error: ', e);
             });
     }

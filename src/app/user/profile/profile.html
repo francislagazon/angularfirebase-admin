@@ -1,0 +1,47 @@
+<div class="row alert_position" *ngIf="error.message">
+    <ngb-alert [type]="error.type" class="ml-auto mr-auto" (close)="closeAlert()">{{ error.message }}</ngb-alert>
+</div> 
+<form [formGroup]="form" (submit)="onSubmitProfile()" class="form-horizontal mt-2" role="form">
+    <div class="container profile">
+        <h1 class="mb-5 pb-3">Profile</h1>
+        <div class="row">
+        <!-- left column -->
+        <div class="col-md-3">
+            <div class="text-center">
+            <img src="{{ userProfile.photoURL }}" class="avatar img-circle w-100" alt="avatar">
+            </div>
+        </div>
+        
+        <!-- edit form column -->
+        <div class="col-md-9 personal-info">
+            <h3>Personal info</h3>
+            <div class="form-group w-100">
+                <label class="col-lg-3 control-label d-inline-block text-right">Full Name:</label>
+                <div class="col-lg-8 d-inline-block">
+                <input class="form-control" name="displayName" type="text" formControlName="displayName">
+                </div>
+            </div>
+            <div class="form-group w-100">
+                <label class="col-lg-3 control-label d-inline-block text-right">Email:</label>
+                <div class="col-lg-8 d-inline-block">
+                <input class="form-control" name="email" type="text" formControlName="email">
+                </div>
+            </div>
+            <div class="form-group w-100">
+                <label class="col-lg-3 control-label d-inline-block text-right">Provider:</label>
+                <div class="col-lg-8 d-inline-block">
+                <input class="form-control" name="providerId" type="text" formControlName="providerId" readonly>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-md-3 control-label d-inline-block"></label>
+                <div class="col-md-8 d-inline-block">
+                <button type="submit" class="btn btn-primary">Update</button>
+                <span></span>
+                <input type="reset" class="btn btn-default" value="Cancel">
+                </div>
+            </div>
+        </div>
+    </div>
+    </div>
+</form>

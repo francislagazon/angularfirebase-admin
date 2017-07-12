@@ -36,6 +36,7 @@ interface POST_COMMON {
     sticky_all_forum?: boolean;
     stamp?: number;
     photoUrl?: string;
+    secret?: string;
 }
 
 // export interface POST_CREATE extends REQUEST, UID, CATEGORIES, POST_COMMON {};
